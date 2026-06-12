@@ -1,0 +1,345 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Customer Churn Prediction System</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            overflow: hidden;
+        }
+        
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 40px;
+            text-align: center;
+        }
+        
+        .header h1 {
+            font-size: 2em;
+            margin-bottom: 10px;
+        }
+        
+        .content {
+            padding: 40px;
+        }
+        
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        
+        .form-group {
+            margin-bottom: 15px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 600;
+            color: #333;
+        }
+        
+        input, select {
+            width: 100%;
+            padding: 10px;
+            border: 2px solid #e0e0e0;
+            border-radius: 5px;
+            font-size: 14px;
+            transition: border-color 0.3s;
+        }
+        
+        input:focus, select:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+        
+        button {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 12px 30px;
+            border: none;
+            border-radius: 5px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: transform 0.2s;
+            width: 100%;
+        }
+        
+        button:hover {
+            transform: translateY(-2px);
+        }
+        
+        .result {
+            margin-top: 30px;
+            padding: 20px;
+            border-radius: 10px;
+            display: none;
+        }
+        
+        .result.show {
+            display: block;
+            animation: slideIn 0.5s ease;
+        }
+        
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .risk-high {
+            background: #fee;
+            border-left: 4px solid #e74c3c;
+        }
+        
+        .risk-medium {
+            background: #ffeaa7;
+            border-left: 4px solid #f39c12;
+        }
+        
+        .risk-low {
+            background: #d5f4e6;
+            border-left: 4px solid #27ae60;
+        }
+        
+        .probability-bar {
+            width: 100%;
+            height: 30px;
+            background: #e0e0e0;
+            border-radius: 15px;
+            overflow: hidden;
+            margin: 20px 0;
+        }
+        
+        .probability-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #27ae60, #e74c3c);
+            transition: width 0.5s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+        }
+        
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-top: 20px;
+        }
+        
+        .stat-card {
+            background: #f7f9fc;
+            padding: 20px;
+            border-radius: 10px;
+            text-align: center;
+        }
+        
+        .stat-value {
+            font-size: 1.5em;
+            font-weight: bold;
+            color: #667eea;
+        }
+        
+        @media (max-width: 768px) {
+            .content {
+                padding: 20px;
+            }
+            
+            .header h1 {
+                font-size: 1.5em;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🎯 Customer Churn Prediction System</h1>
+            <p>Predict customer churn and take proactive retention actions</p>
+        </div>
+        
+        <div class="content">
+            <form id="predictionForm">
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label>📅 Tenure (months)</label>
+                        <input type="number" id="tenure" required value="12">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>💰 Monthly Charges ($)</label>
+                        <input type="number" step="0.01" id="monthly_charges" required value="70.00">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>📄 Contract Type</label>
+                        <select id="contract">
+                            <option value="Month-to-month">Month-to-month</option>
+                            <option value="One year">One year</option>
+                            <option value="Two year">Two year</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>🌐 Internet Service</label>
+                        <select id="internet_service">
+                            <option value="DSL">DSL</option>
+                            <option value="Fiber optic">Fiber optic</option>
+                            <option value="No">No</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>👴 Senior Citizen</label>
+                        <select id="senior_citizen">
+                            <option value="0">No</option>
+                            <option value="1">Yes</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>🔒 Online Security</label>
+                        <select id="online_security">
+                            <option value="Yes">Yes</option>
+                            <option value="No">No</option>
+                            <option value="No internet service">No internet service</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <button type="submit">🔮 Predict Churn Risk</button>
+            </form>
+            
+            <div id="result" class="result">
+                <h2>📊 Prediction Results</h2>
+                <div id="riskIndicator"></div>
+                <div class="probability-bar">
+                    <div id="probabilityFill" class="probability-fill" style="width: 0%">0%</div>
+                </div>
+                <div class="stats">
+                    <div class="stat-card">
+                        <div class="stat-value" id="churnProb">-</div>
+                        <div>Churn Probability</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value" id="retentionProb">-</div>
+                        <div>Retention Probability</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value" id="riskLevel">-</div>
+                        <div>Risk Level</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        document.getElementById('predictionForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const formData = {
+                tenure: parseInt(document.getElementById('tenure').value),
+                monthly_charges: parseFloat(document.getElementById('monthly_charges').value),
+                contract: document.getElementById('contract').value,
+                internet_service: document.getElementById('internet_service').value,
+                senior_citizen: parseInt(document.getElementById('senior_citizen').value),
+                online_security: document.getElementById('online_security').value,
+                gender: 'Male',
+                partner: 'No',
+                dependents: 'No',
+                phone_service: 'Yes',
+                multiple_lines: 'No',
+                online_backup: 'No',
+                device_protection: 'No',
+                tech_support: 'No',
+                streaming_tv: 'No',
+                streaming_movies: 'No',
+                paperless_billing: 'Yes',
+                payment_method: 'Electronic check',
+                total_charges: document.getElementById('tenure').value * document.getElementById('monthly_charges').value
+            };
+            
+            try {
+                const response = await fetch('/predict', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(formData)
+                });
+                
+                const result = await response.json();
+                
+                const resultDiv = document.getElementById('result');
+                resultDiv.classList.add('show');
+                
+                const churnProb = (result.churn_probability * 100).toFixed(1);
+                const retentionProb = (result.retention_probability * 100).toFixed(1);
+                
+                document.getElementById('churnProb').textContent = `${churnProb}%`;
+                document.getElementById('retentionProb').textContent = `${retentionProb}%`;
+                document.getElementById('riskLevel').textContent = result.risk_level;
+                
+                const probabilityFill = document.getElementById('probabilityFill');
+                probabilityFill.style.width = `${churnProb}%`;
+                probabilityFill.textContent = `${churnProb}%`;
+                
+                const riskIndicator = document.getElementById('riskIndicator');
+                let riskClass = '';
+                let recommendation = '';
+                
+                if (result.risk_level === 'High') {
+                    riskClass = 'risk-high';
+                    recommendation = '⚠️ High risk! Immediate action recommended: Offer discounts, improve service, or provide personalized retention offers.';
+                } else if (result.risk_level === 'Medium') {
+                    riskClass = 'risk-medium';
+                    recommendation = '📊 Medium risk: Monitor closely, engage with customer, and consider proactive outreach.';
+                } else {
+                    riskClass = 'risk-low';
+                    recommendation = '✅ Low risk: Continue providing good service and maintain regular engagement.';
+                }
+                
+                riskIndicator.className = riskClass;
+                riskIndicator.style.padding = '20px';
+                riskIndicator.style.borderRadius = '10px';
+                riskIndicator.style.marginBottom = '20px';
+                riskIndicator.innerHTML = `<strong>Risk Assessment:</strong> ${result.risk_level} Risk Customer<br><br>${recommendation}`;
+                
+            } catch (error) {
+                console.error('Error:', error);
+                alert('Error making prediction. Please try again.');
+            }
+        });
+    </script>
+</body>
+</html>

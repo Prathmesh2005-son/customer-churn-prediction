@@ -1,0 +1,2 @@
+# Create the file using echo command
+echo '{"tenure": 12, "monthly_charges": 85.5, "total_charges": 1026, "gender": "Male", "senior_citizen": 0, "partner": "No", "dependents": "No", "phone_service": "Yes", "multiple_lines": "No", "internet_service": "Fiber optic", "online_security": "No", "online_backup": "No", "device_protection": "No", "tech_support": "No", "streaming_tv": "Yes", "streaming_movies": "Yes", "contract": "Month-to-month", "paperless_billing": "Yes", "payment_method": "Electronic check"}' > sample_data.json
