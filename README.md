@@ -21,5 +21,5 @@ This Machine Learning project predicts customer churn for telecom companies usin
 
 ### 1. Clone the repository
 ```bash
-git clone https://github.com/yourusername/customer-churn-prediction.git
+git clone https://github.com/Prathmesh2005-son/customer-churn-prediction.git
 cd customer-churn-prediction
